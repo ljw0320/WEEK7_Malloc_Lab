@@ -237,6 +237,7 @@ void *mm_realloc(void *ptr, size_t size)
         copySize = size;
 
     memcpy(newptr, ptr, copySize);
+    // PUT(newptr, GET(ptr));
     mm_free(ptr);
 
     return newptr;
