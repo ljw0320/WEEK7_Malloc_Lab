@@ -9,7 +9,7 @@ extern void *mm_realloc(void *ptr, size_t size);
 #define WSIZE 4
 #define DSIZE 8
 #define CHUNKSIZE (1<<12)
-
+#define MINSIZE 24
 #define MAX(x,y) ((x) > (y)? (x) : (y))
 
 #define PACK(size, alloc) ((size) | (alloc))
@@ -23,8 +23,13 @@ extern void *mm_realloc(void *ptr, size_t size);
 #define HDRP(bp)        ((char *)(bp) - WSIZE)
 #define FTRP(bp)        ((char *)(bp) + GET_SIZE(HDRP(bp)) - DSIZE)
 
-#define NEXT_BLKP(bp)   ((char *)(bp) + GET_SIZE(((char *)(bp) - WSIZE)))
 #define PREV_BLKP(bp)   ((char *)(bp) - GET_SIZE(((char *)(bp) - DSIZE)))
+#define NEXT_BLKP(bp)   ((char *)(bp) + GET_SIZE(((char *)(bp) - WSIZE)))
+
+#define PRED_BLKP(bp)    (*(void **)(bp))
+#define SUCC_BLKP(bp)    (*(void **)((char*)bp + sizeof(void *)))
+
+#define PUT_PTR(bp, val)    (*(void **)(bp) = (val))
 
 /*------------------------------------macro------------------------------------*/
 
