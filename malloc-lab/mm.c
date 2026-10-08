@@ -487,92 +487,92 @@ static expand_cases try_expand_block(void *bp, size_t asize)
         return EXPAND_NEXT;
     }
 
-    // //앞 인접 블록이 free
-    // if (!prev_alloc && (prev_size + cur_size) >= asize) {
-    //     void *prev = PREV_BLKP(bp);
-    //     void *pred = PRED_BLKP(prev);
-    //     void *succ = SUCC_BLKP(prev);
+    //앞 인접 블록이 free
+    if (!prev_alloc && (prev_size + cur_size) >= asize) {
+        void *prev = PREV_BLKP(bp);
+        void *pred = PRED_BLKP(prev);
+        void *succ = SUCC_BLKP(prev);
 
-    //     remove_free_block(EXPAND_PREV, bp);
+        remove_free_block(EXPAND_PREV, bp);
 
-    //     memmove(prev, bp, copySize);
+        memmove(prev, bp, copySize);
 
-    //     if ((prev_size + cur_size) - asize >= MINSIZE) {
-    //         size_t remain = cur_size + prev_size - asize;                
+        if ((prev_size + cur_size) - asize >= MINSIZE) {
+            size_t remain = cur_size + prev_size - asize;                
 
-    //         PUT(HDRP(prev), PACK(asize, 1));
-    //         PUT(FTRP(prev), PACK(asize, 1));     
+            PUT(HDRP(prev), PACK(asize, 1));
+            PUT(FTRP(prev), PACK(asize, 1));     
 
-    //         void *remain_bp = NEXT_BLKP(prev);            
+            void *remain_bp = NEXT_BLKP(prev);            
 
-    //         PUT(HDRP(remain_bp), PACK(remain, 0));
-    //         PUT(FTRP(remain_bp), PACK(remain, 0));
+            PUT(HDRP(remain_bp), PACK(remain, 0));
+            PUT(FTRP(remain_bp), PACK(remain, 0));
 
-    //         PRED_BLKP(remain_bp) = pred;
-    //         SUCC_BLKP(remain_bp) = succ;
+            PRED_BLKP(remain_bp) = pred;
+            SUCC_BLKP(remain_bp) = succ;
 
-    //         if (pred != NULL)
-    //             SUCC_BLKP(pred) = remain_bp;
-    //         else 
-    //             free_listp = remain_bp;
+            if (pred != NULL)
+                SUCC_BLKP(pred) = remain_bp;
+            else 
+                free_listp = remain_bp;
             
-    //         if (succ != NULL)
-    //             PRED_BLKP(succ) = remain_bp;            
+            if (succ != NULL)
+                PRED_BLKP(succ) = remain_bp;            
 
-    //         return EXPAND_PREV;
-    //     }
+            return EXPAND_PREV;
+        }
 
-    //     cur_size += prev_size;        
-    //     PUT(HDRP(prev), PACK(cur_size, 1));
-    //     PUT(FTRP(prev), PACK(cur_size, 1)); 
+        cur_size += prev_size;        
+        PUT(HDRP(prev), PACK(cur_size, 1));
+        PUT(FTRP(prev), PACK(cur_size, 1)); 
 
-    //     return EXPAND_PREV;
-    // }
+        return EXPAND_PREV;
+    }
 
-    // if (!prev_alloc && !next_alloc &&
-    //     (prev_size + cur_size + next_size) >= asize) {
+    if (!prev_alloc && !next_alloc &&
+        (prev_size + cur_size + next_size) >= asize) {
 
-    //     // 분할 전 주소
-    //     void *prev = PREV_BLKP(bp);
-    //     void *next = NEXT_BLKP(bp);
-    //     void *pred = PRED_BLKP(prev);
-    //     void *succ = SUCC_BLKP(next);        
+        // 분할 전 주소
+        void *prev = PREV_BLKP(bp);
+        void *next = NEXT_BLKP(bp);
+        void *pred = PRED_BLKP(prev);
+        void *succ = SUCC_BLKP(next);        
 
-    //     remove_free_block(EXPAND_BOTH, bp);
+        remove_free_block(EXPAND_BOTH, bp);
 
-    //     memmove(prev, bp, copySize);
+        memmove(prev, bp, copySize);
 
-    //     if ((prev_size + cur_size + next_size) - asize >= MINSIZE) {
-    //         size_t remain = prev_size + cur_size + next_size - asize;            
+        if ((prev_size + cur_size + next_size) - asize >= MINSIZE) {
+            size_t remain = prev_size + cur_size + next_size - asize;            
         
-    //         PUT(HDRP(prev), PACK(asize, 1));
-    //         PUT(FTRP(prev), PACK(asize, 1));             
+            PUT(HDRP(prev), PACK(asize, 1));
+            PUT(FTRP(prev), PACK(asize, 1));             
 
-    //         void *remain_bp = NEXT_BLKP(prev);            
+            void *remain_bp = NEXT_BLKP(prev);            
 
-    //         PUT(HDRP(remain_bp), PACK(remain, 0));
-    //         PUT(FTRP(remain_bp), PACK(remain, 0));
+            PUT(HDRP(remain_bp), PACK(remain, 0));
+            PUT(FTRP(remain_bp), PACK(remain, 0));
 
-    //         PRED_BLKP(remain_bp) = pred;
-    //         SUCC_BLKP(remain_bp) = succ;
+            PRED_BLKP(remain_bp) = pred;
+            SUCC_BLKP(remain_bp) = succ;
 
-    //         if (pred != NULL)
-    //             SUCC_BLKP(pred) = remain_bp;
-    //         else 
-    //             free_listp = remain_bp;
+            if (pred != NULL)
+                SUCC_BLKP(pred) = remain_bp;
+            else 
+                free_listp = remain_bp;
             
-    //         if (succ != NULL)
-    //             PRED_BLKP(succ) = remain_bp;
+            if (succ != NULL)
+                PRED_BLKP(succ) = remain_bp;
 
-    //         return EXPAND_BOTH;
-    //     }
+            return EXPAND_BOTH;
+        }
 
-    //     cur_size += (prev_size + next_size); 
-    //     PUT(HDRP(prev), PACK(cur_size, 1));
-    //     PUT(FTRP(prev), PACK(cur_size, 1)); 
+        cur_size += (prev_size + next_size); 
+        PUT(HDRP(prev), PACK(cur_size, 1));
+        PUT(FTRP(prev), PACK(cur_size, 1)); 
 
-    //     return EXPAND_BOTH;
-    // }
+        return EXPAND_BOTH;
+    }
     return EXPAND_FAIL;
 }
 
